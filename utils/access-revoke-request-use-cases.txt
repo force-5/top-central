@@ -1,0 +1,115 @@
+Use Case: Access Revoke Request
+
+Scope: CARE Central
+
+Preconditions: The system has authenticated the user's credentials
+
+Actors: Any user with permissions to make access revoke request, system.
+
+MAIN SUCCESS SCENARIO
+
+1. User or system selects a worker.
+2. User or system enters reason for revoke request.
+3. User or system uploads any supporting documentation.
+4. System starts Drools Access Revoke Request
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: CARE Central Drools Access Revoke Request
+
+OPEN ISSUES
+
+--------------------------------------
+Use Case: Drools Access Revoke Request
+
+Scope: CARE Central
+
+Preconditions:
+
+Actors: Business unit requester, location manager, system.
+
+MAIN SUCCESS SCENARIO
+
+1. Create pending request for location manager confirmation.
+2. Wait for location manager confirmation.
+3. Update location entitlementRole access for worker.
+4. Send access revoked email to business unit requester.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Location Manager Process CARE Central Requests
+
+NOTES
+
+1. Pending requests are written to a table.
+2. Users have to login to the system to approve or reject a pending request.
+
+OPEN ISSUES
+
+------------------------------------------------------------------
+Use Case: Care Central Sample Drools Non-Employee's Access Request
+
+Scope: CARE Central
+
+Actors: Business unit requester, location manager, system
+
+MAIN SUCCESS SCENARIO
+
+1. If original requester is not the business unit requester (sponsor) then
+2.    Create pending request for sponsor approval.
+3.    Send pending request email to sponsor for approval.
+4.    Wait for sponsor approval.
+5. Create pending request for location manager approval.
+6. Wait for location manager approval.
+7. Update location entitlementRole access for worker.
+8. Send access granted email to business unit requester.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Location Manager Process CARE Central Requesta Job.
+
+NOTES
+
+1. Pending requests are written to a table.
+2. Users have to login to the system to approve or reject a pending request.
+
+ISSUES
+
+--------------------------------------------------------------------------
+Use Case: Location Manager Sample Drools Access Revoke Request
+
+Scope: Location Manager
+
+Actors: Location entitlementRole ccGatekeeper(s), location ccGatekeepers, system.
+
+MAIN SUCCESS SCENARIO
+
+1. Create pending request for location entitlementRole ccGatekeeper approval.
+2. Send pending request email to location entitlementRole ccGatekeeper(s).
+3. Wait for location entitlementRole ccGatekeeper(s) approval.
+4. Send access revoke request approved email to location ccGatekeepers.
+5. Create pending request for location ccGatekeeper confirmation.
+6. Wait for confirmation of access revoked from each location ccGatekeeper.
+7. Update CARE Central pending request to be complete.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+NOTES
+
+1. Pending requests are written to a table.
+2. Users have to login to the system to take action on a pending request.
+

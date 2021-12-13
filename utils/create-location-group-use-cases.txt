@@ -1,0 +1,127 @@
+Use Case: Create Location EntitlementRole
+
+Scope: Location Manager
+
+Preconditions: The system has authenticated the user's credentials and user has permission to create location entitlementRoles
+
+Actors: Location entitlementRole ccGatekeepers
+
+MAIN SUCCESS SCENARIO
+
+1. User enters location entitlementRole data.
+2. System starts Drools Create Location EntitlementRole with location entitlementRole as input parameter.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Drools Create Location EntitlementRole
+
+NOTES
+
+OPEN ISSUES
+
+----------------------------------------------------------------
+Use Case: Drools Create Location EntitlementRole (Sample)
+
+Scope: Location Manager Drools Flow
+
+Actors: System
+
+MAIN SUCCESS SCENARIO
+
+1. If active and expose flags are true then
+      Call CARE Central Create Location EntitlementRole web service
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Drools Create Location EntitlementRole
+
+NOTES
+
+1. This sample Drools flow only contains 1 step but could also include more steps if necessary.  Maybe to send out email to all the ccGatekeepers about the new location entitlementRole.
+
+OPEN ISSUES
+
+---------------------------------------------------------
+Use Case: Create Location EntitlementRole web service
+
+Scope: CARE Central
+
+Actors: System
+
+MAIN SUCCESS SCENARIO
+
+1. Start Drools Create Location EntitlementRole
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Drools Create Location EntitlementRole
+
+NOTES
+
+OPEN ISSUES
+
+---------------------------------------------------------
+Use Case: Drools Create Location EntitlementRole
+
+Scope: CARE Central
+
+Actors: System
+
+MAIN SUCCESS SCENARIO
+
+1. Create pending request for create location entitlementRole approval
+2. Send pending request email to location entitlementRole approver?
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Approve Location EntitlementRole
+
+NOTES
+
+1. The flow does not include a wait for location entitlementRole approver approval since there is no step after this.
+
+OPEN ISSUES
+
+1. Do we need another application role called location entitlementRole approver?  Or do we need to allow the creation of arbitrary application roles?  Then we need to allow a user to belong to application roles.
+
+---------------------------------------------------------
+Use Case: Approve Location EntitlementRole
+
+Scope: CARE Central
+
+Preconditions: The system has authenticated the user's credentials and user has permission to approve location entitlementRoles
+
+Actors: Location EntitlementRole Approvers, system.
+
+MAIN SUCCESS SCENARIO
+
+1. User selects pending location entitlementRole approval request.
+2. User adds required certifications based on standards.
+3. User enters comment.
+4. User uploads any supporting documentation.
+5. System updates pending request to be complete.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+NOTES
+
+ISSUES
+

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD JasperReport//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport name="contractorByVendor" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="com.force5solutions.care.*"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="FOOTER_IMAGE_FILE" class="java.lang.String"/>
+	<field name="vendorName" class="java.lang.String"/>
+	<field name="contractorVOs" class="java.util.Collection"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="39">
+			<staticText>
+				<reportElement key="staticText-1" x="1" y="0" width="298" height="38" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Contractor Vendor Report]]></text>
+			</staticText>
+			<textField pattern="MM/dd/yyyy HH:mm:ss" hyperlinkType="None">
+				<reportElement x="435" y="18" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="67">
+			<subreport isUsingCache="true">
+				<reportElement key="subreport-1" x="5" y="37" width="524" height="25"/>
+				<dataSourceExpression><![CDATA[new JRBeanCollectionDataSource($F{contractorVOs})]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "/contractorByVendorDetailsSubReport.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement key="staticText-9" x="35" y="7" width="232" height="26" forecolor="#636363"/>
+				<textElement textAlignment="Right">
+					<font size="16" isBold="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<text><![CDATA[Vendor Company Name : ]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true" hyperlinkType="None">
+				<reportElement key="textField-1" x="268" y="7" width="245" height="26"/>
+				<textElement textAlignment="Left">
+					<font size="16" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{vendorName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="78" isSplitAllowed="false">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="None">
+				<reportElement key="textField" x="488" y="56" width="41" height="18"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<image hyperlinkType="None">
+				<reportElement key="image-1" x="150" y="2" width="180" height="72"/>
+				<graphicElement/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "../images/"+$P{FOOTER_IMAGE_FILE}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="78">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="None">
+				<reportElement key="textField-2" x="488" y="55" width="41" height="18"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<image hyperlinkType="None">
+				<reportElement key="image-2" x="150" y="4" width="180" height="72" isRemoveLineWhenBlank="true"/>
+				<graphicElement/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "../images/"+$P{FOOTER_IMAGE_FILE}]]></imageExpression>
+			</image>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

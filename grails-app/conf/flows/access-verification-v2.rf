@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="Access Verification Workflow" id="com.force5solutions.care.workflow.access-verification-v2"
+         package-name="com.force5solutions.care.workflow">
+
+  <header>
+    <imports>
+      <import name="com.force5solutions.care.workflow.CentralWorkflowUtilService"/>
+    </imports>
+    <variables>
+      <variable name="responseElements">
+           <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.HashMap"/>
+      </variable>
+      <variable name="workflowType" >
+        <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="com.force5solutions.care.workflow.CentralWorkflowType" />
+      </variable>
+      <variable name="droolsSessionId" >
+        <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long" />
+      </variable>
+      <variable name="workflowGuid" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="actorSlid" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="workerId" >
+        <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long" />
+      </variable>
+      <variable name="workerEntitlementRoleIds">
+         <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.HashSet"/>
+      </variable>
+    </variables>
+  </header>
+
+  <nodes>
+    <start id="1" name="Start" x="468" y="4" width="80" height="40" />
+    <humanTask id="18" name="Waiting for Review from Supervisor" x="282" y="225" width="434" height="40" >
+      <work name="Central Workflow Task" >
+          <parameter name="workflowTaskTemplate">
+              <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+              <value>ACCESS_VERIFICATION</value>
+          </parameter>
+      </work>
+      <mapping type="in" from="droolsSessionId" to="droolsSessionId" />
+      <mapping type="in" from="actorSlid" to="actorSlid" />
+      <mapping type="in" from="workflowGuid" to="workflowGuid" />
+      <mapping type="in" from="workerId" to="workerId" />
+      <mapping type="in" from="workflowType" to="workflowType" />
+      <mapping type="out" from="responseElements" to="responseElements" />
+    </humanTask>
+    <end id="21" name="End" x="934" y="666" width="80" height="40" />
+    <split id="27" name="Is Approved?" x="502" y="530" width="145" height="75" type="2" >
+      <constraints>
+        <constraint toNodeId="32" toType="DROOLS_DEFAULT" name="no" priority="3" type="code" dialect="java" >return ("AUTO CONFIRM".equals(responseElements.get("userAction")));</constraint>
+        <constraint toNodeId="28" toType="DROOLS_DEFAULT" name="yes" priority="1" type="code" dialect="java" >return ("CONFIRM".equals(responseElements.get("userAction")));</constraint>
+        <constraint toNodeId="30" toType="DROOLS_DEFAULT" name="yes" priority="2" type="code" dialect="java" >return ("REVOKE ALL".equals(responseElements.get("userAction")));</constraint>
+      </constraints>
+    </split>
+    <forEach id="30" name="Initiating Revoke for all the subordinates" x="394" y="376" width="316" height="76"
+                 variableName="workerEntitlementRoleId" collectionExpression="workerEntitlementRoleIds">
+        <nodes>
+            <actionNode id="1" name="Revocation initiated by APS" x="788" y="797" width="125" height="40">
+                 <action type="expression" dialect="mvel">
+                      CentralWorkflowUtilService.startRevokeAfterApsAccessVerificationResponse(workerEntitlementRoleId, "Revocation initiated by APS due to escalated Access Verification");
+                 </action>
+             </actionNode>
+          </nodes>
+          <connections>
+          </connections>
+          <in-ports>
+              <in-port type="DROOLS_DEFAULT" nodeId="1" nodeInType="DROOLS_DEFAULT"/>
+          </in-ports>
+          <out-ports>
+              <out-port type="DROOLS_DEFAULT" nodeId="1" nodeOutType="DROOLS_DEFAULT"/>
+          </out-ports>
+    </forEach>
+    <humanTask id="26" name="Initial Task" x="443" y="110" width="109" height="40" >
+      <work name="Central Workflow Task" >
+             <parameter name="workflowTaskTemplate">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>INITIAL_TASK_TEMPLATE</value>
+                </parameter>
+                <parameter name="taskStatus">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>COMPLETE</value>
+                </parameter>
+      </work>
+      <mapping type="in" from="droolsSessionId" to="droolsSessionId" />
+      <mapping type="in" from="actorSlid" to="actorSlid" />
+      <mapping type="in" from="workflowGuid" to="workflowGuid" />
+      <mapping type="in" from="workerId" to="workerId" />
+      <mapping type="in" from="workflowType" to="workflowType" />
+    </humanTask>
+    <end id="28" name="End" x="369" y="686" width="80" height="40" />
+    <end id="32" name="End" x="369" y="686" width="80" height="40" />
+    <end id="33" name="End" x="369" y="686" width="80" height="40" />
+    <humanTask id="13" name="Pending APS Response" x="403" y="437" width="221" height="40" >
+      <work name="Central Workflow Task" >
+           <parameter name="workflowTaskTemplate">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>APS_SYSTEM_TASK_TEMPLATE</value>
+                </parameter>
+                <parameter name="actorSlid">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>APS System</value>
+                </parameter>
+      </work>
+      <mapping type="in" from="droolsSessionId" to="droolsSessionId" />
+      <mapping type="in" from="actorSlid" to="actorSlid" />
+      <mapping type="in" from="workflowGuid" to="workflowGuid" />
+      <mapping type="in" from="workerId" to="workerId" />
+      <mapping type="in" from="workflowType" to="workflowType" />
+      <mapping type="out" from="responseElements" to="responseElements" />
+    </humanTask>
+    <split id="14" name="Is Confirmed?" x="481" y="313" width="106" height="40" type="2">
+      <constraints>
+        <constraint toNodeId="13" toType="DROOLS_DEFAULT" name="yes" priority="1" type="code" dialect="mvel">
+            return ("CREATE APS TASK".equals(responseElements.get("userAction")));
+        </constraint>
+        <constraint toNodeId="21" toType="DROOLS_DEFAULT" name="no" priority="2" type="code" dialect="mvel">
+            return true;
+        </constraint>
+      </constraints>
+    </split>
+  </nodes>
+
+  <connections>
+    <connection from="26" to="18" />
+    <connection from="14" to="21" />
+    <connection from="13" to="27" />
+    <connection from="1" to="26" />
+    <connection from="27" to="28" />
+    <connection from="14" to="13" />
+    <connection from="18" to="14" />
+    <connection from="27" to="30" />
+    <connection from="27" to="32" />
+    <connection from="30" to="33" />
+  </connections>
+
+</process>

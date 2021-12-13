@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="Access Granted By Feed Workflow" id="com.force5solutions.care.workflow.access-granted-by-feed"
+         package-name="com.force5solutions.care.workflow">
+
+    <header>
+        <imports>
+        </imports>
+        <variables>
+            <variable name="workflowType">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType"
+                      className="com.force5solutions.care.workflow.CentralWorkflowType"/>
+            </variable>
+            <variable name="workerEntitlementRoleId">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long"/>
+            </variable>
+            <variable name="droolsSessionId">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long"/>
+            </variable>
+            <variable name="workflowGuid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="justification">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="actorSlid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+        </variables>
+    </header>
+
+    <nodes>
+        <start id="1" name="Start" x="189" y="11" width="80" height="40"/>
+        <humanTask id="2" name="Access Granted By Feed" x="175" y="72" width="109" height="40">
+            <work name="Central Workflow Task">
+                <parameter name="workflowTaskTemplate">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>INITIAL_TASK_TEMPLATE</value>
+                </parameter>
+                 <parameter name="taskStatus">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>COMPLETE</value>
+                </parameter>
+            </work>
+            <mapping type="in" from="droolsSessionId" to="droolsSessionId"/>
+            <mapping type="in" from="workflowGuid" to="workflowGuid"/>
+            <mapping type="in" from="workerEntitlementRoleId" to="workerEntitlementRoleId"/>
+            <mapping type="in" from="workflowType" to="workflowType"/>
+            <mapping type="in" from="justification" to="justification"/>
+            <mapping type="in" from="actorSlid" to="actorSlid"/>
+        </humanTask>
+        <end id="3" name="End" x="462" y="785" width="80" height="40"/>
+    </nodes>
+
+    <connections>
+        <connection from="1" to="2"/>
+        <connection from="2" to="3"/>
+    </connections>
+
+</process>

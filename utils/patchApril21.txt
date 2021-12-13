@@ -1,0 +1,29 @@
+1. Central database
+drop table alert_email_recipients;
+drop table alert_roles;
+drop table alert;
+drop table certification_expiration_notification;
+
+2. Bring-up the application on central (you will see certain exceptions)
+
+Please take special note of the following config property (in PatchService on Central), which specifies the folder location where XML files are stored.
+
+complianceDashboardFileFolderLocation = "/tmp"
+
+XML generation job runs every 5 minutes.
+
+3. Shut-down and bring-up the application again (should not see any exceptions now at the time of start-up)
+
+4. For each revocation task in Central database, set the value of revocation_type to 'REVOKE_WORKFLOW_TASK_IN_7_DAYS' or 'REVOKE_WORKFLOW_TASK_IN_24_HOURS'
+ [select * from central_workflow_task where workflow_type = 'EMPLOYEE_ACCESS_REVOKE' AND node_name != 'Initial Task';]
+
+5. Bring up the application on APS
+
+6. Execute the following code on APS Grails console
+
+def patchService = ctx.getBean("patchService");
+patchService.applyPatch();
+
+7. Modify gatekeepers property in "cc_entitlement_role" table so that it says "first name last name"
+
+

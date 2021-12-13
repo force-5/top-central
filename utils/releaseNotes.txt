@@ -1,0 +1,26 @@
+## 27-07-2011 - Implementing CONTRACTOR HR INFO FEED on a data warehouse feed schema
+
+
+-- Changes have been made in ContractorHrInfo domain. The domain now contains many fields and does not have many
+
+   earlier used fields. (We might have to include a script to drop the table in our build process)
+
+-- Creation of Business Unit is done on the basis of the field 'businessUnit' in ContractorHrInfo
+
+
+
+## 28-07-2011 - Implementing CONTRACTOR COURSE FEED and CONTRACTOR PRA FEED on a data warehouse feed schema
+
+-- Domain ContractorPraAndCourseInfo has been changed. Drop the old tables and start afresh.
+
+-- ASSUMPTION -> We have taken startDate(which is a completionDate) as a new Date(); as it was not specified in the excel sheet.
+
+
+## 28-07-2011 - Implementing EMPLOYEE COURSE FEED on a data warehouse feed schema
+
+-- The implementation has been changed from operation on the basis of course numbers to course names now as the feed does not provide the course numbers anymore.
+
+
+## 28-07-2011 - Implementing EMPLOYEE PRA FEED on a data warehouse feed schema
+
+-- Employee PRA Feed - The lastBackgroundDate in PRAFeedVO takes a new Date() as its value as the new schema does not provide any startDate(or similar date)

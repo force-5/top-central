@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="Revoke Request Workflow" id="com.force5solutions.care.workflow.revoke-request-contractor"
+         package-name="com.force5solutions.care.workflow">
+
+    <header>
+        <imports>
+            <import name="com.force5solutions.care.cc.WorkerEntitlementRole"/>
+            <import name="com.force5solutions.care.cc.EntitlementRoleAccessStatus"/>
+            <import name="com.force5solutions.care.common.CareConstants.*"/>
+            <import name="com.force5solutions.care.workflow.CentralWorkflowUtilService"/>
+        </imports>
+        <variables>
+            <variable name="responseElements">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.HashMap"/>
+            </variable>
+            <variable name="workflowType">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType"
+                      className="com.force5solutions.care.workflow.CentralWorkflowType"/>
+            </variable>
+            <variable name="workerEntitlementRoleId">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long"/>
+            </variable>
+            <variable name="droolsSessionId">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long"/>
+            </variable>
+            <variable name="workflowGuid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="workflowTaskTemplate">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="effectiveStartDate">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.Date"/>
+            </variable>
+            <variable name="justification">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="documents">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="actorSlid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="revokeCompleteTemplate">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+        </variables>
+    </header>
+
+    <nodes>
+        <start id="1" name="Start" x="165" y="32" width="80" height="40"/>
+        <humanTask id="2" name="Initial Task" x="175" y="72" width="109" height="40">
+            <work name="Central Workflow Task">
+                <parameter name="workflowTaskTemplate">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>INITIAL_TASK_TEMPLATE</value>
+                </parameter>
+                <parameter name="taskStatus">
+                    <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                    <value>COMPLETE</value>
+                </parameter>
+            </work>
+            <mapping type="in" from="droolsSessionId" to="droolsSessionId"/>
+            <mapping type="in" from="workflowGuid" to="workflowGuid"/>
+            <mapping type="in" from="workerEntitlementRoleId" to="workerEntitlementRoleId"/>
+            <mapping type="in" from="workflowType" to="workflowType"/>
+            <mapping type="in" from="justification" to="justification"/>
+            <mapping type="in" from="documents" to="documents"/>
+            <mapping type="in" from="actorSlid" to="actorSlid"/>
+        </humanTask>
+        <humanTask id="18" name="Pending Revocation by APS" x="114" y="152" width="236" height="40">
+            <work name="Central Workflow Task">
+                <parameter name="actorSlid">
+                   <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                   <value>APS System</value>
+               </parameter>
+            </work>
+            <mapping type="in" from="droolsSessionId" to="droolsSessionId"/>
+            <mapping type="in" from="workflowGuid" to="workflowGuid"/>
+            <mapping type="in" from="workflowType" to="workflowType"/>
+            <mapping type="in" from="workerEntitlementRoleId" to="workerEntitlementRoleId"/>
+            <mapping type="in" from="workflowTaskTemplate" to="workflowTaskTemplate"/>
+            <mapping type="in" from="effectiveStartDate" to="effectiveStartDate"/>
+            <mapping type="out" from="responseElements" to="responseElements"/>
+            <onEntry>
+                <action type="expression" dialect="mvel">
+                    WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId, EntitlementRoleAccessStatus.getPendingRevocation(), [:], "Pending Revocation by APS");
+                </action>
+            </onEntry>
+        </humanTask>
+        <end id="21" name="End" x="321" y="460" width="80" height="40"/>
+        <split id="23" name="Is Successful?" x="156" y="212" width="143" height="40" type="2">
+            <constraints>
+                <constraint toNodeId="22" toType="DROOLS_DEFAULT" name="yes" priority="1" type="code" dialect="java">
+                    return ("CONFIRM".equals(responseElements.get("userAction")));
+                </constraint>
+                <constraint toNodeId="24" toType="DROOLS_DEFAULT" name="no" priority="3" type="code" dialect="java">
+                    return true;
+                </constraint>
+                 <constraint toNodeId="29" toType="DROOLS_DEFAULT" name="no" priority="2" type="code" dialect="java">
+                     return ("REJECT".equals(responseElements.get("userAction")));
+                </constraint>
+            </constraints>
+        </split>
+        <actionNode id="22" name="Revoke Access" x="213" y="285" width="298" height="45">
+            <action type="expression" dialect="mvel">
+                WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId,
+                EntitlementRoleAccessStatus.getRevoked(), responseElements);
+            </action>
+        </actionNode>
+        <actionNode id="29" name="Rejected Revoke" x="213" y="285" width="298" height="45">
+            <action type="expression" dialect="mvel">
+                WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId,
+                EntitlementRoleAccessStatus.getActive(), responseElements);
+            </action>
+        </actionNode>
+        <actionNode id="27" name="Revoke Access" x="213" y="285" width="298" height="45">
+            <action type="expression" dialect="mvel">
+               CentralWorkflowUtilService.sendNotificationForWorkerEntitlementRole(revokeCompleteTemplate, workerEntitlementRoleId);
+            </action>
+        </actionNode>
+        <end id="25" name="End" x="50" y="466" width="80" height="40"/>
+        <end id="30" name="End" x="50" y="466" width="80" height="40"/>
+        <actionNode id="24" name="Error" x="36" y="289" width="124" height="40">
+            <action type="expression" dialect="mvel">
+                WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId,
+                EntitlementRoleAccessStatus.getError(), responseElements);
+            </action>
+        </actionNode>
+    </nodes>
+
+    <connections>
+        <connection from="1" to="2"/>
+        <connection from="2" to="18"/>
+        <connection from="22" to="27"/>
+        <connection from="27" to="21"/>
+        <connection from="18" to="23"/>
+        <connection from="23" to="22"/>
+        <connection from="24" to="25"/>
+        <connection from="23" to="24"/>
+        <connection from="23" to="29"/>
+        <connection from="29" to="30"/>
+    </connections>
+
+</process>

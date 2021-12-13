@@ -1,0 +1,139 @@
+Use Case: Non-employee's Access Request
+
+Scope: CARE Central
+
+Preconditions: The system has authenticated the user's credentials.
+
+Actors:  Non-employee's sponsor or delegate.
+
+MAIN SUCCESS SCENARIO
+
+1. User selects a worker.
+2. User selects or adds business unit requester (sponsor) to worker.
+3. User selects a location entitlementRole.
+4. User enters an access justification (business reason) comment.
+5. User uploads any supporting documentation.
+6. System starts CARE Central Drools Non-Employee Access Request with request as input parameter.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: CARE Central Drools Non-Employee's Access Request
+
+OPEN ISSUES
+
+1. What are the rules for what workers a user can act as sponsor or delegate for?
+Currently the system checks the security role of the user to see if they have rights to make an access request.  The security role may have further restrictions based on the application role of the user (business unit, ccGatekeeper, etc.).
+
+------------------------------------------------------------------
+Use Case: Drools Non-Employee's Access Request (Sample)
+
+Scope: CARE Central
+
+Actors: Business unit requester, location manager, system
+
+MAIN SUCCESS SCENARIO
+
+1. If original requester is not the business unit requester (sponsor) then
+2.    Create pending request for sponsor approval.
+3.    Send pending request email to sponsor for approval.
+4.    Wait for sponsor approval.
+5. Create pending request for location manager approval.
+6. Wait for location manager approval.
+7. Update location entitlementRole access for worker.
+8. Send access granted email to business unit requester.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Location Manager Process CARE Central Requesta Job.
+
+NOTES
+
+1. Pending requests are written to a table.
+2. Users have to login to the system to approve or reject a pending request.
+
+ISSUES
+
+-------------------------------------------------------------
+Use Case: Process CARE Central Requests Job
+
+Scope: Location Manager
+
+Actors: System
+
+MAIN SUCCESS SCENARIO
+
+1. Wait for CARE Central pending requests.
+2. If Non-Employee Access Request then
+3.    Start Location Manager Non-Employee Access Request Drools Flow with request as parameter.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+RELATED INFORMATION
+
+Subordinate Use Cases: Location Manager Drools Access Request
+
+NOTES
+
+--------------------------------------------------------------------------
+Use Case: Location Manager Sample Drools Access Request
+
+Scope: Location Manager
+
+Actors: Location entitlementRole ccGatekeeper(s), location ccGatekeepers, system.
+
+MAIN SUCCESS SCENARIO
+
+1. Create pending request for location entitlementRole ccGatekeeper approval.
+2. Send pending request email to location entitlementRole ccGatekeeper(s).
+3. Wait for location entitlementRole ccGatekeeper(s) approval.
+4. Send access request approved email to location ccGatekeepers.
+5. Create pending request for location ccGatekeeper confirmation.
+6. Wait for confirmation of access granted from each location ccGatekeeper.
+7. Update CARE Central pending request to be complete.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+NOTES
+
+1. Pending requests are written to a table.
+2. Users have to login to the system to take action on a pending request.
+
+--------------------------------------------------------------------------
+Use Case: Processing pending request
+
+Preconditions: The system has authenticated the user's credentials and the user has permission to process the pending request.
+
+Scope: Location Manager
+
+Actors: Location entitlementRole ccGatekeeper(s), location ccGatekeepers, system.
+
+MAIN SUCCESS SCENARIO
+
+1. User selects from list of pending requests.
+2. User selects action (e.g. approve, reject, confirm).
+3. User enters comment.
+4. User uploads any supporting documentation.
+5. System updates pending request to be complete.
+
+EXTENSIONS
+
+SUB-VARIATIONS
+
+NOTES
+
+ISSUES
+
+1. How does the location manager perform user authentication?  In CARE Central we were using a JAR file provided by FPL that checked the corporate LDAP.  The business units may have their own LDAP.
+

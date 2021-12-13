@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD JasperReport//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport name="contractorByBur" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="com.force5solutions.care.*"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="FOOTER_IMAGE_FILE" class="java.lang.String" isForPrompting="false"/>
+	<field name="firstName" class="java.lang.String"/>
+	<field name="lastName" class="java.lang.String"/>
+	<field name="module" class="java.lang.String"/>
+	<field name="contractorVOs" class="java.util.Collection"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="36">
+			<staticText>
+				<reportElement key="staticText-1" mode="Transparent" x="0" y="0" width="387" height="34" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="24" isBold="false" isUnderline="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<text><![CDATA[Business Unit Requester Report]]></text>
+			</staticText>
+			<textField pattern="MM/dd/yyyy HH:mm:ss" hyperlinkType="None">
+				<reportElement x="435" y="14" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="80">
+			<subreport isUsingCache="true">
+				<reportElement key="subreport-1" x="0" y="41" width="529" height="38"/>
+				<dataSourceExpression><![CDATA[new JRBeanCollectionDataSource($F{contractorVOs})]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "contractorByBurDetailsSubReport.jasper"]]></subreportExpression>
+			</subreport>
+			<elementGroup>
+				<staticText>
+					<reportElement key="staticText-2" x="6" y="5" width="242" height="28" forecolor="#636467"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="18" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<text><![CDATA[Business Unit Requester :  ]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="None">
+					<reportElement key="textField-1" x="248" y="5" width="282" height="28"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font size="18" isBold="false" pdfFontName="Helvetica"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[" "+$F{lastName}+","+$F{firstName}]]></textFieldExpression>
+				</textField>
+			</elementGroup>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="4"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="73">
+			<image hyperlinkType="None">
+				<reportElement key="image-1" x="150" y="0" width="180" height="72"/>
+				<graphicElement/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "../images/"+$P{FOOTER_IMAGE_FILE}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="None">
+				<reportElement key="textField" x="468" y="48" width="55" height="18"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="75">
+			<image hyperlinkType="None">
+				<reportElement key="image-2" x="150" y="0" width="180" height="72"/>
+				<graphicElement/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "../images/"+$P{FOOTER_IMAGE_FILE}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="None">
+				<reportElement key="textField-2" x="474" y="49" width="55" height="18"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="3"/>
+	</summary>
+</jasperReport>

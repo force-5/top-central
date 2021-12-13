@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="Access Request Workflow For Contractor" id="com.force5solutions.care.workflow.access-request-contractor"
+         package-name="com.force5solutions.care.workflow">
+
+    <header>
+        <imports>
+            <import name="com.force5solutions.care.cc.EntitlementRoleAccessStatus"/>
+            <import name="com.force5solutions.care.cc.WorkerEntitlementRole"/>
+        </imports>
+        <variables>
+            <variable name="responseElements">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.util.HashMap"/>
+            </variable>
+            <variable name="workflowType">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType"
+                      className="com.force5solutions.care.workflow.CentralWorkflowType"/>
+            </variable>
+            <variable name="workerEntitlementRoleId">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long"/>
+            </variable>
+            <variable name="droolsSessionId">
+                <type name="org.drools.process.core.datatype.impl.type.ObjectDataType" className="java.lang.Long"/>
+            </variable>
+            <variable name="workflowGuid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="justification">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="documents">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+            <variable name="actorSlid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+            </variable>
+        </variables>
+    </header>
+
+    <nodes>
+    <start id="1" name="Start" x="577" y="-11" width="80" height="40" />
+    <join id="42" name="Rejected by APS" x="702" y="603" width="164" height="40" type="2" />
+    <actionNode id="9" name="Granted Access" x="260" y="467" width="138" height="40" >
+        <action type="expression" dialect="mvel" >WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId, EntitlementRoleAccessStatus.getActive(), responseElements);</action>
+    </actionNode>
+    <humanTask id="43" name="Entitlement Role Provisioned Notification" x="180" y="606" width="309" height="40" >
+        <work name="Central Workflow Task">
+            <parameter name="workflowTaskTemplate">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>ENTITLEMENT_ROLE_PROVISIONED_NOTIFICATION_EMAIL_CENTRAL_SYSTEM_TASK_FOR_CONTRACTOR</value>
+            </parameter>
+            <parameter name="actorSlid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>Central System</value>
+            </parameter>
+            <parameter name="taskStatus">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>COMPLETE</value>
+            </parameter>
+        </work>
+        <mapping type="in" from="droolsSessionId" to="droolsSessionId"/>
+        <mapping type="in" from="workflowGuid" to="workflowGuid"/>
+        <mapping type="in" from="workerEntitlementRoleId" to="workerEntitlementRoleId"/>
+        <mapping type="in" from="workflowType" to="workflowType"/>
+    </humanTask>
+    <end id="11" name="End" x="313" y="775" width="80" height="40" />
+    <humanTask id="13" name="Pending APS Approval" x="492" y="216" width="221" height="40" >
+        <work name="Central Workflow Task">
+            <parameter name="workflowTaskTemplate">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>APS_SYSTEM_TASK_TEMPLATE</value>
+            </parameter>
+            <parameter name="actorSlid">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>APS System</value>
+            </parameter>
+        </work>
+        <mapping type="in" from="droolsSessionId" to="droolsSessionId"/>
+        <mapping type="in" from="workflowGuid" to="workflowGuid"/>
+        <mapping type="in" from="workerEntitlementRoleId" to="workerEntitlementRoleId"/>
+        <mapping type="in" from="workflowType" to="workflowType"/>
+        <mapping type="out" from="responseElements" to="responseElements"/>
+        <onEntry>
+            <action type="expression" dialect="mvel">
+                WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId, EntitlementRoleAccessStatus.getPendingApproval(), [:], "Pending APS Approval");
+            </action>
+        </onEntry>
+    </humanTask>
+    <split id="14" name="Is Approved?" x="579" y="314" width="106" height="40" type="2" >
+      <constraints>
+        <constraint toNodeId="9" toType="DROOLS_DEFAULT" name="yes" priority="1" type="code" dialect="java" >return ("APPROVE".equals(responseElements.get("userAction")));</constraint>
+        <constraint toNodeId="24" toType="DROOLS_DEFAULT" name="no" priority="3" type="code" dialect="java" >return true;</constraint>
+        <constraint toNodeId="15" toType="DROOLS_DEFAULT" name="no" priority="2" type="code" dialect="java" >return ("REJECT".equals(responseElements.get("userAction")));</constraint>
+      </constraints>
+    </split>
+    <actionNode id="15" name="Rejected Access" x="512" y="465" width="140" height="40" >
+        <action type="expression" dialect="mvel" >WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId, EntitlementRoleAccessStatus.getRejected(), responseElements);</action>
+    </actionNode>
+    <end id="16" name="End" x="710" y="772" width="80" height="40" />
+    <actionNode id="24" name="Rejected Access" x="827" y="464" width="146" height="40" >
+        <action type="expression" dialect="mvel" >WorkerEntitlementRole.changeWorkerEntitlementRoleStatus(workerEntitlementRoleId, EntitlementRoleAccessStatus.getError(), responseElements);</action>
+    </actionNode>
+    <humanTask id="26" name="Initial Task" x="523" y="97" width="155" height="40" >
+        <work name="Central Workflow Task">
+            <parameter name="workflowTaskTemplate">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>INITIAL_TASK_TEMPLATE</value>
+            </parameter>
+            <parameter name="taskStatus">
+                <type name="org.drools.process.core.datatype.impl.type.StringDataType"/>
+                <value>COMPLETE</value>
+            </parameter>
+        </work>
+        <mapping type="in" from="droolsSessionId" to="droolsSessionId"/>
+        <mapping type="in" from="workflowGuid" to="workflowGuid"/>
+        <mapping type="in" from="workerEntitlementRoleId" to="workerEntitlementRoleId"/>
+        <mapping type="in" from="workflowType" to="workflowType"/>
+        <mapping type="in" from="justification" to="justification"/>
+        <mapping type="in" from="documents" to="documents"/>
+        <mapping type="in" from="actorSlid" to="actorSlid"/>
+    </humanTask>
+  </nodes>
+
+  <connections>
+    <connection from="15" to="42" />
+    <connection from="24" to="42" />
+    <connection from="14" to="9" />
+    <connection from="9" to="43" />
+    <connection from="43" to="11" />
+    <connection from="26" to="13" />
+    <connection from="13" to="14" />
+    <connection from="14" to="15" />
+    <connection from="42" to="16" />
+    <connection from="14" to="24" />
+    <connection from="1" to="26" />
+  </connections>
+
+</process>
